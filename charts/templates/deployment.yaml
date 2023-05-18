@@ -17,6 +17,11 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}
+            - secretRef:
+                name: {{ .Chart.Name }}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
