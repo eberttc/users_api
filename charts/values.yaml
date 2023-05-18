@@ -13,4 +13,11 @@ specs:
     port: 4000
     protocol: TCP
     type: ClusterIP
+
+configmap:
+  owner: "eberttc"
+
+secrets:
+  project:
+    key:     
   
