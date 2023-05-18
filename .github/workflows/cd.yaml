@@ -42,3 +42,8 @@ jobs:
             docker push "eberttc.azurecr.io/$IMAGE:stable" && \
             docker push "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT"
           )
+      
+      - name: Login Azure
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}      
