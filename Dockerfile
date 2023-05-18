@@ -9,6 +9,7 @@ ENV MIX_ENV=$MIX_ENV
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 
 RUN mix local.hex --force
+RUN mix local.rebar --force
 
 # install mix dependencies
 RUN apk add --no-cache openssh-client git
