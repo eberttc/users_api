@@ -53,6 +53,16 @@ jobs:
           resource-group: 'k8s-playground_group'
           cluster-name: 'k8s-playground'
       
+      - uses: chrnorm/deployment-action@releases/v1
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: "${{ github.token }}"
+          target_url: https://api-stag.zubale.com
+          environment: staging
+          description: |
+            revision: $GITHUB_SHA
+
       - name: install helm
         uses: azure/setup-helm@v3
         id: install
