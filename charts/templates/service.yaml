@@ -5,7 +5,6 @@ metadata:
   labels:
     backstage.io/kubernetes-id: {{ .Chart.Name }}
     app: {{ .Chart.Name }}
-    env: {{ .Values.labels.backstage.env }}
 spec:
   type: {{ .Values.specs.service.type }}
   ports:
