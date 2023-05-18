@@ -8,6 +8,8 @@ RUN apk add --update git build-base curl
 ENV MIX_ENV=$MIX_ENV
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 
+RUN mix local.hex --force
+
 # install mix dependencies
 RUN apk add --no-cache openssh-client git
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
