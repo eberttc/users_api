@@ -1,0 +1,100 @@
+name: CD 
+
+on:
+  - push
+
+env:
+  IMAGE: user_api
+  NAMESPACE: api
+  ENVIRONMENT: staging
+  SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Login to azure artifact Registry
+        uses: docker/login-action@v2
+        with:
+          registry: eberttc.azurecr.io
+          username: ${{ secrets.USER_ACR }}
+          password: ${{ secrets.PWD_ACR }}   
+
+
+      - name: Build docker image
+        run: |-
+          docker pull "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" > /dev/null || \
+          ( DOCKER_BUILDKIT=1 docker build --ssh default \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg HEX_AUTH_KEY=$HEX_AUTH_KEY  \
+            -t "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" \
+            -t "eberttc.azurecr.io/$IMAGE:stable" \
+            -t "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT" \
+            --cache-from "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT" \
+            . && \
+            docker push "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" && \
+            docker push "eberttc.azurecr.io/$IMAGE:stable" && \
+            docker push "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT"
+          )
+      
+      - name: Login Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}     
+
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: 'k8s-playground_group'
+          cluster-name: 'k8s-playground'
+      
+      - uses: chrnorm/deployment-action@releases/v1
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: "${{ github.token }}"
+          environment: staging
+          description: |
+            revision: "$GITHUB_SHA"
+
+      - name: install helm
+        uses: azure/setup-helm@v3
+        id: install
+        with:
+          version: 'v3.11.1'
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Deploy Helm chart
+        working-directory: ./charts/
+        run: |-
+            helm dependency update
+            helm \
+            -n "$NAMESPACE" \
+            upgrade --install "user-api" \
+            ./ \
+            --values ./values.yaml \
+            --wait \
+            --set secrets.project.key="$SECRET_KEY_BASE" \
+            --set image.tag="$GITHUB_SHA"
+
+      - uses: chrnorm/deployment-status@releases/v1
+        if: success()
+        with:
+          token: "${{ github.token }}"
+          target_url: https://api.zubale.com
+          state: "success"
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
+      - uses: chrnorm/deployment-status@releases/v1
+        if: failure()
+        with:
+          token: "${{ github.token }}"
+          target_url: https://api.zubale.com
+          state: "failure"
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
