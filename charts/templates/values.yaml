@@ -1,0 +1,22 @@
+replicaCount: 1
+image:
+  repository: eberttc.azurecr.io/user_api
+  tag: "stable"
+
+specs:
+  ingress:
+    enabled: true
+    publicUrl: api.zubale.com
+    port: 4000
+  service:
+    name: http
+    port: 4000
+    protocol: TCP
+    type: ClusterIP
+
+configmap:
+  owner: "eberttc"
+
+secrets:
+  project:
+    key:
