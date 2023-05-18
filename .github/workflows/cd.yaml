@@ -80,7 +80,7 @@ jobs:
             ./ \
             --values ./values.yaml \
             --wait \
-            --set secrets.SECRET_KEY_BASE="$SECRET_KEY_BASE" \
+            --set secrets.project.key="$SECRET_KEY_BASE" \
             --set image.tag="$GITHUB_SHA"
 
       - uses: chrnorm/deployment-status@releases/v1
