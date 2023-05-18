@@ -66,7 +66,7 @@ jobs:
             helm dependency update
             helm \
             -n "$NAMESPACE" \
-            upgrade --install "$IMAGE" \
+            upgrade --install "user-api" \
             ./ \
             --values ./values.yaml \
             --wait \
