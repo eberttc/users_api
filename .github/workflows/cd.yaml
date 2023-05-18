@@ -1,0 +1,44 @@
+name: CD (staging)
+
+on:
+  - push
+
+env:
+  IMAGE: user_api
+  NAMESPACE: default
+  ENVIRONMENT: staging
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Login to azure artifact Registry
+        uses: docker/login-action@v2
+        with:
+          registry: eberttc.azurecr.io
+          username: ${{ secrets.USER_ACR }}
+          password: ${{ secrets.PWD_ACR }}   
+
+
+      - name: Build docker image
+        run: |-
+          docker pull "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" > /dev/null || \
+          ( DOCKER_BUILDKIT=1 docker build --ssh default \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg HEX_AUTH_KEY=$HEX_AUTH_KEY  \
+            -t "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" \
+            -t "eberttc.azurecr.io/$IMAGE:stable" \
+            -t "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT" \
+            --cache-from "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT" \
+            . && \
+            docker push "eberttc.azurecr.io/$IMAGE:$GITHUB_SHA" && \
+            docker push "eberttc.azurecr.io/$IMAGE:stable" && \
+            docker push "eberttc.azurecr.io/$IMAGE:$ENVIRONMENT"
+          )
