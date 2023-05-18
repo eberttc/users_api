@@ -5,7 +5,7 @@ on:
 
 env:
   IMAGE: user_api
-  NAMESPACE: default
+  NAMESPACE: api
   ENVIRONMENT: staging
 
 
@@ -46,4 +46,28 @@ jobs:
       - name: Login Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}      
+          creds: ${{ secrets.AZURE_CREDENTIALS }}     
+
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: 'k8s-playground_group'
+          cluster-name: 'k8s-playground'
+      
+      - name: install helm
+      - uses: azure/setup-helm@v3
+        id: install
+        with:
+          version: 'v3.11.1'
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Deploy Helm chart
+          working-directory: ./charts/
+          run: |-
+            helm dependency update
+            helm \
+            -n "$NAMESPACE" \
+            upgrade --install "$IMAGE" \
+            ./ \
+            --values ./values.yaml \
+            --wait \
+            --set image.tag="$GITHUB_SHA"      
