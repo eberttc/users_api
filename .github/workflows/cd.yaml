@@ -58,7 +58,6 @@ jobs:
         id: deployment
         with:
           token: "${{ github.token }}"
-          target_url: https://api-stag.zubale.com
           environment: staging
           description: |
             revision: $GITHUB_SHA
