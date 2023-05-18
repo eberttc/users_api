@@ -60,7 +60,7 @@ jobs:
           token: "${{ github.token }}"
           environment: staging
           description: |
-            revision: $GITHUB_SHA
+            revision: "$GITHUB_SHA"
 
       - name: install helm
         uses: azure/setup-helm@v3
