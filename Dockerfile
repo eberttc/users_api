@@ -23,7 +23,7 @@ COPY config $APP_HOME/config
 ADD mix.exs mix.lock ./
 
 RUN --mount=type=ssh MIX_ENV=dev mix deps.get --only $MIX_ENV
-RUN --mount=type=ssh MIX_ENV=dev mix deps.compile
+RUN mix deps.compile
 RUN MIX_ENV=${MIX_ENV} mix release
 
 CMD ["mix", "phx.server"]
