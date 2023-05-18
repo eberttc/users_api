@@ -61,8 +61,8 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
 
       - name: Deploy Helm chart
-          working-directory: ./charts/
-          run: |-
+        working-directory: ./charts/
+        run: |-
             helm dependency update
             helm \
             -n "$NAMESPACE" \
@@ -70,4 +70,20 @@ jobs:
             ./ \
             --values ./values.yaml \
             --wait \
-            --set image.tag="$GITHUB_SHA"      
+            --set image.tag="$GITHUB_SHA"
+
+      - uses: chrnorm/deployment-status@releases/v1
+        if: success()
+        with:
+          token: "${{ github.token }}"
+          target_url: https://api.zubale.com
+          state: "success"
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
+      - uses: chrnorm/deployment-status@releases/v1
+        if: failure()
+        with:
+          token: "${{ github.token }}"
+          target_url: https://api.zubale.com
+          state: "failure"
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}      
