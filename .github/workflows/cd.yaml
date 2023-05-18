@@ -54,7 +54,7 @@ jobs:
           cluster-name: 'k8s-playground'
       
       - name: install helm
-      - uses: azure/setup-helm@v3
+        uses: azure/setup-helm@v3
         id: install
         with:
           version: 'v3.11.1'
