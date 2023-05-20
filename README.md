@@ -18,6 +18,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
 
+=======
 
 ## Github workflow CI.yml
 
@@ -36,3 +37,4 @@ Generating public/private rsa key pair.
 
 > Enter passphrase (empty for no passphrase):
 > Enter same passphrase again:
+
