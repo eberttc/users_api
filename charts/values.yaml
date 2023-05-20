@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: eberttc.azurecr.io/user_api
+  repository: eberttc.azurecr.io/user-api
   tag: "stable"
 
 specs:

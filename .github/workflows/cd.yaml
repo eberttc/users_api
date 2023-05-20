@@ -4,7 +4,7 @@ on:
   - push
 
 env:
-  IMAGE: user_api
+  IMAGE: user-api
   NAMESPACE: api
   ENVIRONMENT: staging
   SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
