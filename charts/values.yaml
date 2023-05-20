@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: eberttc.azurecr.io/user-api
-  tag: "latest"
+  tag: "stable"
 
 specs:
   ingress:
